@@ -23,10 +23,12 @@ const getCities = async () => {
     );
 
     const requests = [];
+    const apiKey = import.meta.env.VITE_APP_API_KEY;
+
     savedCities.value.forEach((city) => {
       requests.push(
         axios.get(
-          `https://api.openweathermap.org/data/2.5/weather?lat=${city.coords.lat}&lon=${city.coords.lng}&appid=99d0be4165a08cad60cb04f10b3fa2d2&units=imperial`
+          `https://api.openweathermap.org/data/2.5/weather?lat=${city.coords.lat}&lon=${city.coords.lng}&appid=${apiKey}&units=imperial`
         )
       );
     });
