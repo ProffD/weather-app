@@ -8,9 +8,11 @@
   },
   "dependencies": {
     "axios": "^0.27.2",
+    "firebase": "^10.7.1",
     "uid": "^2.0.0",
     "vue": "^3.2.37",
-    "vue-router": "^4.0.16"
+    "vue-router": "^4.0.16",
+    "vue3-toastify": "^0.2.1"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.3.3",

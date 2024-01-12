@@ -21,6 +21,11 @@
             @click="addCity"
             v-if="route.query"
           ></i>
+          <i 
+            class="fa-solid fa-trash ml-3 text-xl hover:text-red-500 duration-150 cursor-pointer"
+            @click="removeCity"
+            v-if="!route.query.preview"
+            ></i>
         </RouterLink>
       </div>
 
@@ -67,17 +72,16 @@
 import { RouterLink, useRoute, useRouter } from "vue-router";
 import { uid } from "uid";
 import { ref } from "vue";
+import { doc, setDoc, deleteDoc } from "firebase/firestore"; 
+import { db } from "@/firebase";
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
 import BaseModal from "./BaseModal.vue";
 
-const savedCities = ref([]);
 const route = useRoute();
 const router = useRouter();
-const addCity = () => {
-  const storedCities = localStorage.getItem("savedCities");
-  if (storedCities) {
-    savedCities.value = JSON.parse(storedCities);
-  }
 
+const addCity = () => {
   const locationObj = {
     id: uid(),
     state: route.params.state,
@@ -88,23 +92,27 @@ const addCity = () => {
     },
   };
 
-  const cityExists = savedCities.value.some(
-    (cityObj) => cityObj.city === locationObj.city
-  );
-
-  if (!cityExists && locationObj.state && locationObj.city) {
-    savedCities.value.push(locationObj);
-
-     // Sort the savedCities array alphabetically by city
-     savedCities.value.sort((a, b) => a.city.localeCompare(b.city));
-
-    localStorage.setItem("savedCities", JSON.stringify(savedCities.value));
-  }
+  saveCityData(locationObj);
 
   let query = Object.assign({}, route.query);
   delete query.preview;
   query.id = locationObj.id;
   router.replace({ query });
+};
+
+const saveCityData = async (city) => {
+  await setDoc(doc(db, "cities", route.params.city), city);
+  toast.success("City has been successfully saved.", {
+        autoClose: 5000,
+      });
+};
+
+const removeCity = async () => {
+  await deleteDoc(doc(db, "cities", route.params.city));
+  
+  toast.success("City has been successfully removed.", {
+        autoClose: 5000,
+      });
 };
 
 const modalActive = ref(null);

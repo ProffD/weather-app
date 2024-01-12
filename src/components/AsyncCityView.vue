@@ -123,8 +123,7 @@
         </div>
       </div>
     </div>
-
-    <div
+    <div v-if="!route.query.preview"
       class="flex items-center gap-2 py-12 text-white cursor-pointer duration-150 hover:text-red-500"
       @click="removeCity"
     >
@@ -137,6 +136,10 @@
 <script setup>
 import axios from "axios";
 import { useRoute, useRouter } from "vue-router";
+import { doc, deleteDoc } from "firebase/firestore";
+import { db } from "@/firebase";
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
 
 const route = useRoute();
 const getWeatherData = async () => {
@@ -167,15 +170,14 @@ const getWeatherData = async () => {
 const weatherData = await getWeatherData();
 
 const router = useRouter();
-const removeCity = () => {
-  const cities = JSON.parse(localStorage.getItem("savedCities"));
-  const updatedCities = cities.filter(
-    (city) => city.id !== route.query.id
-  );
-  localStorage.setItem(
-    "savedCities",
-    JSON.stringify(updatedCities)
-  );
+const removeCity = async () => {
+  await deleteDoc(doc(db, "cities", route.params.city));
+  
+  setTimeout(() => {
+    toast.success("City has been successfully removed.", {
+          autoClose: 5000,
+        });
+  },1000)
   router.push({
     name: "home",
   });
